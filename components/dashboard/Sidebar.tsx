@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import {
-  LayoutDashboard,
-  Hotel,
-  PawPrint,
-  BarChart3,
-  ChevronLeft,
-  X,
-} from "lucide-react";
+import { LayoutDashboard, Hotel, PawPrint, BarChart3, X } from "lucide-react";
 
 export type NavPage = "dashboard" | "rooms" | "guests" | "reports";
 
@@ -36,7 +29,6 @@ export default function Sidebar({
   mobileOpen,
   onMobileClose,
 }: Props) {
-  const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [activeIndex, setActiveIndex] = useState(() =>
     NAV.findIndex((n) => n.id === activePage),
@@ -96,13 +88,12 @@ export default function Sidebar({
   const sidebarInner = (isMobile = false) => (
     <aside
       style={{
-        width: isMobile ? "220px" : collapsed ? "68px" : "220px",
+        width: "220px",
         backgroundColor: "#FFF4E6",
         borderRight: "1.5px solid #FED7AA",
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        transition: isMobile ? "none" : "width .3s cubic-bezier(.4,0,.2,1)",
         overflow: "hidden",
         position: "relative",
         flexShrink: 0,
@@ -122,14 +113,17 @@ export default function Sidebar({
         }}
       />
 
+      {/* Header — tingginya sama persis dengan TopBar */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: "10px",
-          padding: "16px 12px",
+          padding: "0 12px",
+          height: "var(--topbar-h)",
           borderBottom: "1.5px solid #FED7AA",
           overflow: "hidden",
+          flexShrink: 0,
         }}
       >
         <div
@@ -153,10 +147,6 @@ export default function Sidebar({
           style={{
             overflow: "hidden",
             flex: 1,
-            opacity: !isMobile && collapsed ? 0 : 1,
-            transform:
-              !isMobile && collapsed ? "translateX(-8px)" : "translateX(0)",
-            transition: "opacity .2s ease, transform .25s ease",
             whiteSpace: "nowrap",
           }}
         >
@@ -191,43 +181,7 @@ export default function Sidebar({
           </span>
         </div>
 
-        {!isMobile ? (
-          <button
-            onClick={() => setCollapsed((v) => !v)}
-            className="hidden lg:flex"
-            style={{
-              width: "26px",
-              height: "26px",
-              borderRadius: "8px",
-              border: "1.5px solid #FED7AA",
-              backgroundColor: "white",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              flexShrink: 0,
-              color: "#C2410C",
-              transition: "all .2s ease",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                "#FFEDD5";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                "white";
-            }}
-          >
-            <div
-              style={{
-                transition: "transform .3s cubic-bezier(.4,0,.2,1)",
-                transform: collapsed ? "rotate(180deg)" : "rotate(0deg)",
-                display: "flex",
-              }}
-            >
-              <ChevronLeft size={13} strokeWidth={2.5} />
-            </div>
-          </button>
-        ) : (
+        {isMobile && (
           <button
             onClick={onMobileClose}
             style={{
@@ -258,29 +212,22 @@ export default function Sidebar({
         )}
       </div>
 
-      <div
-        style={{
-          padding: !isMobile && collapsed ? "12px 8px 4px" : "12px 12px 4px",
-          transition: "padding .3s ease",
-        }}
-      >
-        {(isMobile || !collapsed) && (
-          <span
-            style={{
-              fontSize: "10px",
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "#FDBA74",
-              display: "block",
-              opacity: mounted ? 1 : 0,
-              transform: mounted ? "translateY(0)" : "translateY(4px)",
-              transition: "opacity .4s ease .2s, transform .4s ease .2s",
-            }}
-          >
-            Navigation
-          </span>
-        )}
+      <div style={{ padding: "12px 12px 4px" }}>
+        <span
+          style={{
+            fontSize: "10px",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            color: "#FDBA74",
+            display: "block",
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? "translateY(0)" : "translateY(4px)",
+            transition: "opacity .4s ease .2s, transform .4s ease .2s",
+          }}
+        >
+          Navigation
+        </span>
       </div>
 
       <nav
@@ -296,7 +243,6 @@ export default function Sidebar({
           const Icon = item.icon;
           const isActive = activeIndex === idx;
           const isHovered = hoveredIndex === idx;
-          const isCollapsed = !isMobile && collapsed;
 
           return (
             <button
@@ -304,13 +250,12 @@ export default function Sidebar({
               onClick={(e) => handleNavClick(item.id, idx, e)}
               onMouseEnter={() => setHoveredIndex(idx)}
               onMouseLeave={() => setHoveredIndex(null)}
-              title={isCollapsed ? item.label : undefined}
               style={{
                 position: "relative",
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
-                padding: isCollapsed ? "9px" : "9px 12px",
+                padding: "9px 12px",
                 borderRadius: "12px",
                 border: "none",
                 cursor: "pointer",
@@ -320,7 +265,6 @@ export default function Sidebar({
                 textAlign: "left",
                 width: "100%",
                 overflow: "hidden",
-                justifyContent: isCollapsed ? "center" : "flex-start",
                 color: isActive ? "white" : "#9A3412",
                 background: isActive
                   ? "linear-gradient(135deg,#FB923C,#EA580C)"
@@ -374,19 +318,11 @@ export default function Sidebar({
                 />
               </span>
 
-              <span
-                style={{
-                  opacity: isCollapsed ? 0 : 1,
-                  transform: isCollapsed ? "translateX(-6px)" : "translateX(0)",
-                  transition: "opacity .2s ease, transform .25s ease",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                }}
-              >
+              <span style={{ whiteSpace: "nowrap", overflow: "hidden" }}>
                 {item.label}
               </span>
 
-              {isActive && !isCollapsed && (
+              {isActive && (
                 <span
                   style={{
                     marginLeft: "auto",
@@ -411,10 +347,6 @@ export default function Sidebar({
           borderRadius: "16px",
           backgroundColor: "#FFF0E0",
           border: "1.5px solid #FED7AA",
-          overflow: "hidden",
-          opacity: !isMobile && collapsed ? 0 : 1,
-          transform: !isMobile && collapsed ? "scale(.95)" : "scale(1)",
-          transition: "opacity .2s ease, transform .25s ease",
         }}
       >
         <div
@@ -535,16 +467,7 @@ export default function Sidebar({
         >
           <PawPrint size={13} color="white" strokeWidth={2.5} />
         </div>
-        <div
-          style={{
-            opacity: !isMobile && collapsed ? 0 : 1,
-            transform:
-              !isMobile && collapsed ? "translateX(-8px)" : "translateX(0)",
-            transition: "opacity .2s ease, transform .25s ease",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ whiteSpace: "nowrap", overflow: "hidden" }}>
           <p
             style={{
               fontSize: "12px",
@@ -598,10 +521,7 @@ export default function Sidebar({
     <>
       <div
         className="hidden lg:flex h-screen sticky top-0 flex-shrink-0"
-        style={{
-          width: collapsed ? "68px" : "220px",
-          transition: "width .3s cubic-bezier(.4,0,.2,1)",
-        }}
+        style={{ width: "220px" }}
       >
         {sidebarInner(false)}
       </div>
