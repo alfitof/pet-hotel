@@ -2,7 +2,6 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Orange Palette ── */
   --color-o50: #fff7ed;
   --color-o100: #ffedd5;
   --color-o200: #fed7aa;
@@ -10,42 +9,30 @@
   --color-o400: #fb923c;
   --color-o500: #f97316;
   --color-o600: #ea580c;
-  --color-o700: #c2410c;
-  --color-o800: #9a3412;
-  --color-o900: #7c2d12;
 
-  /* ── Warm Neutrals ── */
-  --color-sand: #fdf3e7;
-  --color-warm: #fef9f5;
-  --color-muted: #78350f;
+  --color-sand: #fffbf5;
+  --color-warm: #fff8f0;
 
-  /* ── Accents ── */
-  --color-yellow: #fcd34d;
-  --color-green: #86efac;
-  --color-green-d: #16a34a;
-  --color-red: #fca5a5;
+  --color-green: #d1fae5;
+  --color-green-d: #059669;
+  --color-red: #fee2e2;
   --color-red-d: #dc2626;
-  --color-blue: #bae6fd;
-  --color-blue-d: #0284c7;
+  --color-blue: #dbeafe;
+  --color-blue-d: #2563eb;
+  --color-yellow: #fef3c7;
+  --color-yellow-d: #d97706;
 
-  /* ── Sidebar ── */
-  --sidebar-w: 240px;
-  --sidebar-bg: #7c2d12;
+  --sidebar-w: 220px;
+  --topbar-h: 64px;
 
   --font-display: "Baloo 2", cursive;
   --font-body: "Nunito", sans-serif;
 }
 
-html {
-  font-size: 14px;
-}
-
 body {
   font-family: var(--font-body);
   background-color: var(--color-sand);
-  color: var(--color-o800);
-  min-height: 100vh;
-  overflow-x: hidden;
+  color: #431407;
 }
 
 h1,
@@ -53,26 +40,23 @@ h2,
 h3,
 h4,
 h5,
-h6,
-button {
+h6 {
   font-family: var(--font-display);
 }
 
-/* ─────────── Scrollbar ─────────── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: var(--color-o100);
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-o400);
+  background: var(--color-o300);
   border-radius: 99px;
 }
 
-/* ─────────── Keyframes ─────────── */
 @keyframes bounceIn {
   0% {
     transform: scale(0) rotate(-12deg);
@@ -96,25 +80,13 @@ button {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-7px);
-  }
-}
-@keyframes wiggle {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  20% {
-    transform: rotate(-4deg);
-  }
-  60% {
-    transform: rotate(4deg);
+    transform: translateY(-6px);
   }
 }
 @keyframes slideRight {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-16px);
   }
   to {
     opacity: 1;
@@ -124,7 +96,7 @@ button {
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -133,43 +105,15 @@ button {
 }
 @keyframes popIn {
   0% {
-    transform: scale(0.7);
+    transform: scale(0.75);
     opacity: 0;
   }
   80% {
-    transform: scale(1.08);
+    transform: scale(1.06);
     opacity: 1;
   }
   100% {
     transform: scale(1);
-  }
-}
-@keyframes shimmer {
-  0% {
-    background-position: -300% center;
-  }
-  100% {
-    background-position: 300% center;
-  }
-}
-@keyframes pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-@keyframes countUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 @keyframes fadeIn {
@@ -180,22 +124,26 @@ button {
     opacity: 1;
   }
 }
+@keyframes shimmer {
+  0% {
+    background-position: -300% center;
+  }
+  100% {
+    background-position: 300% center;
+  }
+}
 
-/* ─────────── Utility Classes ─────────── */
 .anim-bounce-in {
-  animation: bounceIn 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+  animation: bounceIn 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
 }
 .anim-float {
   animation: float 3s ease-in-out infinite;
 }
-.anim-wiggle {
-  animation: wiggle 0.5s ease-in-out;
-}
 .anim-slide-right {
-  animation: slideRight 0.4s ease forwards;
+  animation: slideRight 0.35s ease forwards;
 }
 .anim-slide-up {
-  animation: slideUp 0.4s ease forwards;
+  animation: slideUp 0.35s ease forwards;
 }
 .anim-pop-in {
   animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -204,28 +152,33 @@ button {
   animation: fadeIn 0.3s ease forwards;
 }
 
-/* Staggered children */
 .stagger > *:nth-child(1) {
-  animation-delay: 0.05s;
+  opacity: 0;
+  animation-delay: 0.04s;
 }
 .stagger > *:nth-child(2) {
-  animation-delay: 0.1s;
+  opacity: 0;
+  animation-delay: 0.08s;
 }
 .stagger > *:nth-child(3) {
-  animation-delay: 0.15s;
+  opacity: 0;
+  animation-delay: 0.12s;
 }
 .stagger > *:nth-child(4) {
-  animation-delay: 0.2s;
+  opacity: 0;
+  animation-delay: 0.16s;
 }
 .stagger > *:nth-child(5) {
-  animation-delay: 0.25s;
+  opacity: 0;
+  animation-delay: 0.2s;
 }
 .stagger > *:nth-child(6) {
-  animation-delay: 0.3s;
+  opacity: 0;
+  animation-delay: 0.24s;
 }
 
 .shimmer-text {
-  background: linear-gradient(90deg, #f97316, #fcd34d, #ea580c, #f97316);
+  background: linear-gradient(90deg, #f97316, #fb923c, #ea580c, #f97316);
   background-size: 300% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -233,50 +186,98 @@ button {
   animation: shimmer 4s linear infinite;
 }
 
-/* Sidebar nav active */
-.nav-item {
+.card {
+  background: white;
+  border-radius: 20px;
+  border: 1.5px solid var(--color-o100);
+  box-shadow: 0 2px 12px rgba(249, 115, 22, 0.07);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-o400), var(--color-o600));
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
   transition: all 0.2s ease;
+  box-shadow: 0 3px 10px rgba(249, 115, 22, 0.3);
+  border: none;
+  cursor: pointer;
 }
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateX(4px);
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(249, 115, 22, 0.4);
 }
-.nav-item.active {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: inset 3px 0 0 #fcd34d;
-}
-
-/* Card hover lift */
-.card-lift {
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-.card-lift:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(234, 88, 12, 0.18) !important;
+.btn-primary:active {
+  transform: scale(0.97);
 }
 
-/* Cargo slot */
+.btn-ghost {
+  background: var(--color-o50);
+  color: var(--color-o600);
+  font-family: var(--font-display);
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  border: 1.5px solid var(--color-o200);
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  background: var(--color-o100);
+}
+
+.modal-overlay {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #9a3412;
+  transition: all 0.18s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+.nav-link:hover {
+  background: var(--color-o100);
+  color: var(--color-o600);
+}
+.nav-link.active {
+  background: linear-gradient(135deg, var(--color-o400), var(--color-o500));
+  color: white;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+}
+.nav-link.active svg {
+  color: white;
+}
+
 .cargo-wrap {
   transition: transform 0.2s ease;
 }
 .cargo-wrap:hover {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
-/* Occupied dot pulse */
-.pulse-dot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: currentColor;
-  animation: pulse-ring 1.5s ease-out infinite;
+.card-hover {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
-
-/* Modal */
-.modal-overlay {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.14) !important;
 }

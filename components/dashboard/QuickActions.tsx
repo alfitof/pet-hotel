@@ -1,5 +1,7 @@
 "use client";
 
+import { PlusSquare, PawPrint, Phone, FileText } from "lucide-react";
+
 interface Props {
   onAddSlot: () => void;
   onCheckInFirst: () => void;
@@ -13,77 +15,78 @@ export default function QuickActions({
 }: Props) {
   const actions = [
     {
-      icon: "🏠",
-      label: "Tambah Kamar",
-      desc: "Buat slot baru",
+      Icon: PlusSquare,
+      label: "Add Room",
+      desc: "New slot",
       onClick: onAddSlot,
-      bg: "linear-gradient(135deg, var(--color-o500), var(--color-o700))",
+      bg: "linear-gradient(135deg,#FB923C,#EA580C)",
       disabled: false,
     },
     {
-      icon: "🐾",
+      Icon: PawPrint,
       label: "Check-In",
-      desc: "Daftarkan pet baru",
+      desc: "New guest",
       onClick: onCheckInFirst,
-      bg: "linear-gradient(135deg, #16A34A, #15803D)",
+      bg: "linear-gradient(135deg,#34D399,#059669)",
       disabled: !emptySlotExists,
     },
     {
-      icon: "📞",
-      label: "Hubungi Pemilik",
-      desc: "WhatsApp blast",
-      onClick: () => alert("Fitur segera hadir! 🎉"),
-      bg: "linear-gradient(135deg, #0284C7, #0369A1)",
+      Icon: Phone,
+      label: "Contact",
+      desc: "Owners",
+      onClick: () => alert("Coming soon!"),
+      bg: "linear-gradient(135deg,#60A5FA,#2563EB)",
       disabled: false,
     },
     {
-      icon: "📊",
-      label: "Cetak Laporan",
-      desc: "Export PDF",
-      onClick: () => alert("Fitur segera hadir! 🎉"),
-      bg: "linear-gradient(135deg, #9333EA, #7E22CE)",
+      Icon: FileText,
+      label: "Export",
+      desc: "PDF report",
+      onClick: () => alert("Coming soon!"),
+      bg: "linear-gradient(135deg,#C084FC,#9333EA)",
       disabled: false,
     },
   ];
 
   return (
-    <div
-      className="rounded-3xl p-5"
-      style={{
-        backgroundColor: "white",
-        boxShadow: "0 4px 20px rgba(0,0,0,.06)",
-        border: "2px solid var(--color-o100)",
-      }}
-    >
+    <div className="card p-4">
       <h3
-        className="text-base font-extrabold mb-3 flex items-center gap-2"
-        style={{ color: "var(--color-o800)", fontFamily: "'Baloo 2', cursive" }}
+        className="text-sm font-extrabold mb-3"
+        style={{ color: "#431407", fontFamily: "'Baloo 2', cursive" }}
       >
-        <span>⚡</span> Aksi Cepat
+        Quick Actions
       </h3>
       <div className="grid grid-cols-2 gap-2">
-        {actions.map((a, i) => (
-          <button
-            key={i}
-            onClick={a.onClick}
-            disabled={a.disabled}
-            className="flex flex-col items-start gap-1 p-3 rounded-2xl text-left transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
-            style={{
-              background: a.disabled ? "var(--color-o100)" : a.bg,
-              color: a.disabled ? "var(--color-o400)" : "white",
-              boxShadow: a.disabled ? "none" : "0 4px 12px rgba(0,0,0,.15)",
-            }}
-          >
-            <span className="text-xl">{a.icon}</span>
-            <span
-              className="text-xs font-extrabold"
-              style={{ fontFamily: "'Baloo 2', cursive" }}
+        {actions.map((a, i) => {
+          const Icon = a.Icon;
+          return (
+            <button
+              key={i}
+              onClick={a.onClick}
+              disabled={a.disabled}
+              className="flex flex-col items-start gap-2 p-3 rounded-2xl text-left transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+              style={{
+                background: a.disabled ? "#FFF4E6" : a.bg,
+                color: a.disabled ? "#FB923C" : "white",
+                border: a.disabled ? "1.5px solid #FED7AA" : "none",
+                boxShadow: a.disabled ? "none" : "0 3px 10px rgba(0,0,0,.12)",
+              }}
             >
-              {a.label}
-            </span>
-            <span className="text-xs opacity-75">{a.desc}</span>
-          </button>
-        ))}
+              <Icon size={18} strokeWidth={2} />
+              <div>
+                <p
+                  className="text-xs font-extrabold leading-none"
+                  style={{ fontFamily: "'Baloo 2', cursive" }}
+                >
+                  {a.label}
+                </p>
+                <p className="text-xs mt-0.5 font-medium opacity-80">
+                  {a.desc}
+                </p>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

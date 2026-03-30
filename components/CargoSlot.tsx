@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { LogIn, Trash2, LogOut, Info, X } from "lucide-react";
 import { CargoSlot as CargoSlotType } from "@/lib/types";
+import { PET_BOTTOM_OFFSET } from "@/lib/petTypes";
 
 interface Props {
   slot: CargoSlotType;
@@ -20,33 +22,34 @@ export default function CargoSlot({
   isNew,
 }: Props) {
   const [showDetail, setShowDetail] = useState(false);
-  const [petImgError, setPetImgError] = useState(false);
+  const [petImgErr, setPetImgErr] = useState(false);
   const isEmpty = slot.pet === null;
+
+  const petBottom = slot.pet
+    ? (PET_BOTTOM_OFFSET[slot.pet.petType.id] ?? 30)
+    : 30;
 
   return (
     <div
-      className={`flex flex-col items-center gap-2 group relative ${isNew ? "anim-pop-in" : ""}`}
-      style={{ width: "130px" }}
+      className={`flex flex-col items-center gap-1.5 group relative ${isNew ? "anim-pop-in" : ""}`}
+      style={{ width: "120px" }}
     >
-      {/* Status badge */}
       <div
-        className="text-xs font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1"
+        className="text-xs font-extrabold px-2.5 py-0.5 rounded-full"
         style={{
-          backgroundColor: isEmpty ? "var(--color-o100)" : "var(--color-o500)",
-          color: isEmpty ? "var(--color-o600)" : "white",
+          backgroundColor: isEmpty ? "#FFEDD5" : "#FB923C",
+          color: isEmpty ? "#C2410C" : "white",
           fontFamily: "'Baloo 2', cursive",
         }}
       >
-        {isEmpty ? "🔑" : "😺"} {`K.${slot.id}`}
+        {isEmpty ? "Room" : "🐾"} {slot.id}
       </div>
 
-      {/* Cargo — 3-layer stack */}
       <div
         className="cargo-wrap relative cursor-pointer"
-        style={{ width: "120px", height: "150px" }}
+        style={{ width: "110px", height: "140px" }}
         onClick={() => (isEmpty ? onCheckIn() : setShowDetail((v) => !v))}
       >
-        {/* Layer 1 — base */}
         <Image
           src="/assets/cargo-base.svg"
           alt="cargo"
@@ -56,148 +59,168 @@ export default function CargoSlot({
           priority
         />
 
-        {/* Layer 2 — pet (between layers) */}
-        {!isEmpty && slot.pet && (
+        {!isEmpty && slot.pet && !petImgErr && (
           <div
             key={slot.id + "-" + slot.pet.checkInTimestamp}
             className="absolute anim-bounce-in"
             style={{
               zIndex: 2,
-              bottom: "30px",
-              left: "45%",
+              bottom: `${petBottom}px`,
+              left: "46%",
               transform: "translateX(-50%)",
-              width: "48px",
-              height: "65px",
+              width: "43px",
+              height: "60px",
             }}
           >
-            {!petImgError ? (
-              <Image
-                src={slot.pet.petType.petImage}
-                alt={slot.pet.petName}
-                fill
-                className="object-contain"
-                onError={() => setPetImgError(true)}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-5xl">
-                {slot.pet.petType.emoji}
-              </div>
-            )}
+            <Image
+              src={slot.pet.petType.petImage}
+              alt={slot.pet.petName}
+              fill
+              className="object-contain"
+              onError={() => setPetImgErr(true)}
+            />
           </div>
         )}
 
-        {/* Layer 3 — bars/grille (foreground) */}
+        {!isEmpty && slot.pet && petImgErr && (
+          <div
+            className="absolute flex items-center justify-center text-4xl"
+            style={{
+              zIndex: 2,
+              bottom: `${petBottom}px`,
+              left: "46%",
+              transform: "translateX(-50%)",
+              width: "43px",
+              height: "60px",
+            }}
+          >
+            {slot.pet.petType.species === "dog" ? "🐶" : "🐱"}
+          </div>
+        )}
+
         <Image
           src="/assets/cargo-bars.svg"
-          alt="cargo bars"
+          alt="bars"
           fill
           className="object-contain"
           style={{ zIndex: 3 }}
         />
 
-        {/* Hover overlay kosong */}
         {isEmpty && (
           <div
-            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-2xl"
-            style={{ zIndex: 4, background: "rgba(249,115,22,.15)" }}
+            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"
+            style={{ zIndex: 4, background: "rgba(249,115,22,.12)" }}
           >
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-xl text-white shadow-lg"
-              style={{ backgroundColor: "var(--color-o500)" }}
+              className="w-9 h-9 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "#F97316" }}
             >
-              +
+              <LogIn size={16} color="white" strokeWidth={2.5} />
             </div>
           </div>
         )}
       </div>
 
-      {/* Pet info / actions */}
       {isEmpty ? (
         <div className="w-full flex flex-col gap-1">
           <button
             onClick={onCheckIn}
-            className="w-full py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-105 active:scale-95"
+            className="w-full py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1"
             style={{
-              backgroundColor: "var(--color-o200)",
-              color: "var(--color-o700)",
+              backgroundColor: "#FFEDD5",
+              color: "#EA580C",
               fontFamily: "'Baloo 2', cursive",
             }}
           >
-            + Check-In
+            <LogIn size={11} strokeWidth={2.5} /> Check-In
           </button>
           <button
             onClick={onDeleteEmpty}
-            className="w-full py-1 rounded-xl text-xs font-bold transition-all opacity-0 group-hover:opacity-60 hover:!opacity-100"
-            style={{
-              backgroundColor: "#FEE2E2",
-              color: "#DC2626",
-              fontFamily: "'Nunito', sans-serif",
-            }}
+            className="w-full py-1 rounded-xl text-xs font-bold transition-all opacity-0 group-hover:opacity-70 hover:!opacity-100 flex items-center justify-center gap-1"
+            style={{ backgroundColor: "#FEE2E2", color: "#DC2626" }}
           >
-            🗑 Hapus
+            <Trash2 size={10} strokeWidth={2} /> Delete
           </button>
         </div>
       ) : (
         <div className="w-full text-center">
           <p
             className="text-xs font-extrabold truncate"
-            style={{
-              color: "var(--color-o800)",
-              fontFamily: "'Baloo 2', cursive",
-            }}
+            style={{ color: "#431407", fontFamily: "'Baloo 2', cursive" }}
           >
             {slot.pet!.petName}
           </p>
           <p
-            className="text-xs opacity-60 truncate"
-            style={{ color: "var(--color-o700)" }}
+            className="text-xs font-semibold truncate"
+            style={{ color: "#FB923C" }}
           >
-            {slot.pet!.petType.name} · {slot.pet!.duration}h
+            {slot.pet!.petType.name}
           </p>
-          <button
-            onClick={onCheckOut}
-            className="mt-1 w-full py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-105 active:scale-95"
-            style={{
-              backgroundColor: "#FEE2E2",
-              color: "#DC2626",
-              fontFamily: "'Baloo 2', cursive",
-            }}
-          >
-            Check-Out 👋
-          </button>
+          <div className="flex gap-1 mt-1.5">
+            <button
+              onClick={() => setShowDetail((v) => !v)}
+              className="flex-1 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-105 flex items-center justify-center gap-1"
+              style={{ backgroundColor: "#FFEDD5", color: "#EA580C" }}
+            >
+              <Info size={10} strokeWidth={2} />
+            </button>
+            <button
+              onClick={onCheckOut}
+              className="flex-1 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1"
+              style={{
+                backgroundColor: "#FEE2E2",
+                color: "#DC2626",
+                fontFamily: "'Baloo 2', cursive",
+              }}
+            >
+              <LogOut size={10} strokeWidth={2} /> Out
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Detail tooltip */}
       {showDetail && slot.pet && (
         <div
-          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-30 p-3 rounded-2xl shadow-xl text-xs anim-slide-up whitespace-nowrap"
+          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-30 p-3 rounded-2xl shadow-xl anim-slide-up"
           style={{
             backgroundColor: "white",
-            border: "2px solid var(--color-o200)",
-            color: "var(--color-o800)",
+            border: "1.5px solid #FED7AA",
+            color: "#431407",
             fontFamily: "'Nunito', sans-serif",
+            minWidth: "170px",
+            whiteSpace: "nowrap",
           }}
         >
-          <p
-            className="font-extrabold text-sm"
-            style={{ fontFamily: "'Baloo 2', cursive" }}
+          <div className="flex items-center justify-between mb-2">
+            <p
+              className="text-sm font-extrabold"
+              style={{ fontFamily: "'Baloo 2', cursive" }}
+            >
+              {slot.pet.petType.species === "dog" ? "🐶" : "🐱"}{" "}
+              {slot.pet.petName}
+            </p>
+            <button
+              onClick={() => setShowDetail(false)}
+              className="opacity-40 hover:opacity-100 transition-opacity"
+            >
+              <X size={12} strokeWidth={2} />
+            </button>
+          </div>
+          <div
+            className="flex flex-col gap-1 text-xs font-semibold"
+            style={{ color: "#9A3412" }}
           >
-            {slot.pet.petType.emoji} {slot.pet.petName}
-          </p>
-          <p>👤 {slot.pet.ownerName}</p>
-          {slot.pet.ownerPhone && <p>📞 {slot.pet.ownerPhone}</p>}
-          <p>📅 Masuk: {slot.pet.checkIn}</p>
-          <p>🌙 {slot.pet.duration} hari</p>
-          {slot.pet.notes && (
-            <p className="mt-1 italic opacity-70">📝 {slot.pet.notes}</p>
-          )}
-          <button
-            onClick={() => setShowDetail(false)}
-            className="mt-2 w-full text-center opacity-50 hover:opacity-100 text-xs"
-          >
-            Tutup ✕
-          </button>
+            <p>Owner: {slot.pet.ownerName}</p>
+            {slot.pet.ownerPhone && <p>Phone: {slot.pet.ownerPhone}</p>}
+            <p>Check-in: {slot.pet.checkIn}</p>
+            <p>
+              Duration: {slot.pet.duration} day
+              {slot.pet.duration > 1 ? "s" : ""}
+            </p>
+            {slot.pet.notes && (
+              <p className="italic opacity-70">"{slot.pet.notes}"</p>
+            )}
+          </div>
         </div>
       )}
     </div>

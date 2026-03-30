@@ -1,9 +1,11 @@
+export type PetSpecies = "cat" | "dog";
+
 export type PetType = {
   id: number;
   name: string;
-  emoji: string;
-  petImage: string;
+  species: PetSpecies;
   headImage: string;
+  petImage: string;
 };
 
 export type BookedPet = {
@@ -27,5 +29,4 @@ export type ActivityLog = {
   type: "checkin" | "checkout" | "added" | "removed";
   message: string;
   timestamp: number;
-  emoji: string;
 };

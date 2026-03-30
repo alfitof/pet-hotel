@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { X, AlertCircle } from "lucide-react";
 import PetTypeSelector from "./PetTypeSelector";
 import { PetType, BookedPet } from "@/lib/types";
 
@@ -28,18 +29,18 @@ export default function CheckInModal({
   const [error, setError] = useState("");
 
   const submit = () => {
-    if (!petName.trim()) return setError("Nama pet wajib diisi! 🐾");
-    if (!ownerName.trim()) return setError("Nama pemilik wajib diisi!");
-    if (!petType) return setError("Pilih jenis pet dulu ya! 😊");
+    if (!petName.trim()) return setError("Pet name is required!");
+    if (!ownerName.trim()) return setError("Owner name is required!");
+    if (!petType) return setError("Please select a pet avatar!");
     setError("");
     onConfirm({
       petName: petName.trim(),
       ownerName: ownerName.trim(),
       ownerPhone: ownerPhone.trim() || undefined,
       petType,
-      checkIn: new Date().toLocaleDateString("id-ID", {
+      checkIn: new Date().toLocaleDateString("en-US", {
         day: "2-digit",
-        month: "long",
+        month: "short",
         year: "numeric",
       }),
       checkInTimestamp: Date.now(),
@@ -51,49 +52,41 @@ export default function CheckInModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay"
-      style={{ backgroundColor: "rgba(124,45,18,.35)" }}
+      style={{ backgroundColor: "rgba(120,53,15,.3)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="w-full max-w-lg rounded-3xl shadow-2xl anim-pop-in overflow-hidden"
+        className="w-full max-w-md rounded-3xl shadow-2xl anim-pop-in overflow-hidden"
         style={{
-          backgroundColor: "var(--color-warm)",
+          backgroundColor: "#FFFBF5",
           maxHeight: "92vh",
           overflowY: "auto",
         }}
       >
-        {/* Header */}
         <div
-          className="px-6 py-5 relative"
-          style={{
-            background:
-              "linear-gradient(135deg, var(--color-o500), var(--color-o800))",
-          }}
+          className="px-5 py-4 flex items-center justify-between"
+          style={{ background: "linear-gradient(135deg,#FB923C,#C2410C)" }}
         >
-          <div className="flex items-center gap-3">
-            <span className="text-4xl anim-wiggle">🏨</span>
-            <div>
-              <h2
-                className="text-xl font-extrabold text-white"
-                style={{ fontFamily: "'Baloo 2', cursive" }}
-              >
-                Check-In — Kamar {slotId}
-              </h2>
-              <p className="text-sm text-white/70">
-                Isi data pet kesayanganmu 🐾
-              </p>
-            </div>
+          <div>
+            <h2
+              className="text-lg font-extrabold text-white"
+              style={{ fontFamily: "'Baloo 2', cursive" }}
+            >
+              Check-In — Room {slotId}
+            </h2>
+            <p className="text-sm text-white/75 font-semibold">
+              Fill in your pet's details
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all"
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all"
           >
-            ✕
+            <X size={16} strokeWidth={2.5} />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-6 flex flex-col gap-5">
+        <div className="p-5 flex flex-col gap-4">
           <PetTypeSelector
             petTypes={petTypes}
             selected={petType}
@@ -102,35 +95,31 @@ export default function CheckInModal({
 
           <div className="grid grid-cols-2 gap-3">
             <Field
-              label="🐾 Nama Pet"
-              placeholder="cth: Mochi"
+              label="Pet Name"
+              placeholder="e.g. Mochi"
               value={petName}
               onChange={setPetName}
             />
             <Field
-              label="👤 Nama Pemilik"
-              placeholder="cth: Budi"
+              label="Owner Name"
+              placeholder="e.g. John"
               value={ownerName}
               onChange={setOwnerName}
             />
           </div>
           <Field
-            label="📞 No. HP Pemilik (opsional)"
-            placeholder="cth: 0812-xxxx-xxxx"
+            label="Owner Phone (optional)"
+            placeholder="e.g. 0812-xxxx-xxxx"
             value={ownerPhone}
             onChange={setOwnerPhone}
           />
 
-          {/* Durasi */}
           <div>
             <label
               className="block text-sm font-extrabold mb-2"
-              style={{
-                color: "var(--color-o800)",
-                fontFamily: "'Baloo 2', cursive",
-              }}
+              style={{ color: "#431407", fontFamily: "'Baloo 2', cursive" }}
             >
-              📅 Durasi Menginap
+              Stay Duration
             </label>
             <div className="flex flex-wrap gap-2">
               {DURATIONS.map((d) => (
@@ -138,80 +127,67 @@ export default function CheckInModal({
                   key={d}
                   type="button"
                   onClick={() => setDuration(d)}
-                  className="px-3 py-1.5 rounded-xl text-sm font-bold transition-all hover:scale-105"
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:scale-105"
                   style={{
-                    backgroundColor:
-                      duration === d
-                        ? "var(--color-o500)"
-                        : "var(--color-o100)",
-                    color: duration === d ? "white" : "var(--color-o600)",
+                    backgroundColor: duration === d ? "#F97316" : "#FFEDD5",
+                    color: duration === d ? "white" : "#C2410C",
                     fontFamily: "'Baloo 2', cursive",
                   }}
                 >
-                  {d}h
+                  {d}d
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Catatan */}
           <div>
             <label
               className="block text-sm font-extrabold mb-2"
-              style={{
-                color: "var(--color-o800)",
-                fontFamily: "'Baloo 2', cursive",
-              }}
+              style={{ color: "#431407", fontFamily: "'Baloo 2', cursive" }}
             >
-              📝 Catatan (opsional)
+              Notes (optional)
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="cth: Suka makan basah, takut bunyi keras..."
+              placeholder="e.g. Likes wet food, scared of loud noises..."
               rows={2}
-              className="w-full px-4 py-2.5 rounded-2xl border-2 text-sm resize-none outline-none transition-all focus:border-orange-400"
+              className="w-full px-3.5 py-2.5 rounded-2xl border-2 text-sm resize-none outline-none transition-all"
               style={{
-                borderColor: "var(--color-o200)",
+                borderColor: "#FED7AA",
                 fontFamily: "'Nunito', sans-serif",
-                color: "var(--color-o800)",
+                color: "#431407",
                 backgroundColor: "white",
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#FB923C";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#FED7AA";
               }}
             />
           </div>
 
           {error && (
-            <p
-              className="text-center text-sm font-bold py-2 px-4 rounded-2xl"
+            <div
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl"
               style={{ backgroundColor: "#FEE2E2", color: "#DC2626" }}
             >
-              {error}
-            </p>
+              <AlertCircle size={14} strokeWidth={2} />
+              <p className="text-xs font-bold">{error}</p>
+            </div>
           )}
 
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 py-3 rounded-2xl font-bold transition-all hover:scale-105 active:scale-95"
-              style={{
-                backgroundColor: "var(--color-o100)",
-                color: "var(--color-o700)",
-                fontFamily: "'Baloo 2', cursive",
-              }}
-            >
-              Batal
+          <div className="flex gap-2.5 pt-1">
+            <button onClick={onClose} className="btn-ghost flex-1">
+              Cancel
             </button>
             <button
               onClick={submit}
-              className="flex-1 py-3 rounded-2xl font-bold text-white transition-all hover:scale-105 active:scale-95"
-              style={{
-                background:
-                  "linear-gradient(135deg, var(--color-o500), var(--color-o700))",
-                fontFamily: "'Baloo 2', cursive",
-                boxShadow: "0 6px 20px rgba(249,115,22,.45)",
-              }}
+              className="btn-primary flex-1"
+              style={{ borderRadius: "14px", padding: "10px 16px" }}
             >
-              ✓ Check-In Sekarang! 🐾
+              Confirm Check-In ✓
             </button>
           </div>
         </div>
@@ -235,7 +211,7 @@ function Field({
     <div>
       <label
         className="block text-sm font-extrabold mb-1.5"
-        style={{ color: "var(--color-o800)", fontFamily: "'Baloo 2', cursive" }}
+        style={{ color: "#431407", fontFamily: "'Baloo 2', cursive" }}
       >
         {label}
       </label>
@@ -244,12 +220,18 @@ function Field({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-4 py-2.5 rounded-2xl border-2 text-sm outline-none transition-all focus:border-orange-400"
+        className="w-full px-3.5 py-2.5 rounded-2xl border-2 text-sm outline-none transition-all"
         style={{
-          borderColor: "var(--color-o200)",
+          borderColor: "#FED7AA",
           fontFamily: "'Nunito', sans-serif",
-          color: "var(--color-o800)",
+          color: "#431407",
           backgroundColor: "white",
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = "#FB923C";
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = "#FED7AA";
         }}
       />
     </div>

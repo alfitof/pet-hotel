@@ -1,12 +1,9 @@
 "use client";
 
+import { Home, Users, KeyRound, TrendingUp } from "lucide-react";
 import { CargoSlot } from "@/lib/types";
 
-interface Props {
-  slots: CargoSlot[];
-}
-
-export default function StatsRow({ slots }: Props) {
+export default function StatsRow({ slots }: { slots: CargoSlot[] }) {
   const total = slots.length;
   const occupied = slots.filter((s) => s.pet !== null).length;
   const empty = total - occupied;
@@ -14,85 +11,86 @@ export default function StatsRow({ slots }: Props) {
 
   const cards = [
     {
-      icon: "🏨",
-      label: "Total Kamar",
+      icon: Home,
+      label: "Total Rooms",
       value: total,
-      sub: "kamar terdaftar",
-      bg: "var(--color-o100)",
-      accent: "var(--color-o500)",
-      textColor: "var(--color-o700)",
+      sub: "registered",
+      bg: "#FFF7ED",
+      iconBg: "#FFEDD5",
+      iconColor: "#EA580C",
+      valColor: "#EA580C",
     },
     {
-      icon: "😺",
-      label: "Sedang Menginap",
+      icon: Users,
+      label: "Staying Now",
       value: occupied,
-      sub: "pet aktif",
-      bg: "#FEF9C3",
-      accent: "#CA8A04",
-      textColor: "#854D0E",
+      sub: "active pets",
+      bg: "#FFFBEB",
+      iconBg: "#FEF3C7",
+      iconColor: "#D97706",
+      valColor: "#D97706",
     },
     {
-      icon: "🔑",
-      label: "Kamar Kosong",
+      icon: KeyRound,
+      label: "Available",
       value: empty,
-      sub: "tersedia sekarang",
-      bg: "#DCFCE7",
-      accent: "var(--color-green-d)",
-      textColor: "#14532D",
+      sub: "rooms open",
+      bg: "#F0FDF4",
+      iconBg: "#DCFCE7",
+      iconColor: "#059669",
+      valColor: "#059669",
     },
     {
-      icon: "📈",
-      label: "Tingkat Hunian",
+      icon: TrendingUp,
+      label: "Occupancy Rate",
       value: `${rate}%`,
-      sub: "occupancy rate",
-      bg: "#FEE2E2",
-      accent: "var(--color-red-d)",
-      textColor: "#7F1D1D",
+      sub: "of capacity",
+      bg: "#EFF6FF",
+      iconBg: "#DBEAFE",
+      iconColor: "#2563EB",
+      valColor: "#2563EB",
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
-      {cards.map((c, i) => (
-        <div
-          key={i}
-          className="card-lift rounded-3xl p-4 flex items-center gap-4 anim-slide-up"
-          style={{
-            backgroundColor: c.bg,
-            boxShadow: "0 4px 16px rgba(0,0,0,.06)",
-            opacity: 0,
-          }}
-        >
-          {/* Icon */}
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger">
+      {cards.map((c, i) => {
+        const Icon = c.icon;
+        return (
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-sm"
-            style={{ backgroundColor: "white" }}
+            key={i}
+            className="card card-hover anim-slide-up flex items-center gap-3 p-4"
+            style={{ backgroundColor: c.bg }}
           >
-            {c.icon}
+            <div
+              className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: c.iconBg }}
+            >
+              <Icon size={20} color={c.iconColor} strokeWidth={2} />
+            </div>
+            <div>
+              <p
+                className="text-xs font-semibold mb-0.5"
+                style={{ color: "#9A3412", opacity: 0.7 }}
+              >
+                {c.label}
+              </p>
+              <p
+                className="text-2xl font-extrabold leading-none"
+                style={{ color: c.valColor, fontFamily: "'Baloo 2', cursive" }}
+              >
+                {c.value}
+              </p>
+              <p
+                className="text-xs mt-0.5 font-semibold"
+                style={{ color: "#9A3412", opacity: 0.55 }}
+              >
+                {c.sub}
+              </p>
+            </div>
           </div>
-          {/* Text */}
-          <div>
-            <p
-              className="text-xs font-bold opacity-70 mb-0.5"
-              style={{ color: c.textColor }}
-            >
-              {c.label}
-            </p>
-            <p
-              className="text-2xl font-extrabold leading-none"
-              style={{ color: c.accent, fontFamily: "'Baloo 2', cursive" }}
-            >
-              {c.value}
-            </p>
-            <p
-              className="text-xs mt-0.5 opacity-60"
-              style={{ color: c.textColor }}
-            >
-              {c.sub}
-            </p>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

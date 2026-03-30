@@ -1,21 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import {
+  LayoutDashboard,
+  Hotel,
+  PawPrint,
+  BarChart3,
+  ChevronLeft,
+  X,
+} from "lucide-react";
 
-type NavPage = "dashboard" | "kamar" | "tamu" | "laporan";
+export type NavPage = "dashboard" | "rooms" | "guests" | "reports";
 
 interface Props {
   activePage: NavPage;
   onNavigate: (page: NavPage) => void;
   totalSlots: number;
   occupiedCount: number;
+  mobileOpen: boolean;
+  onMobileClose: () => void;
 }
 
 const NAV = [
-  { id: "dashboard" as NavPage, icon: "🏠", label: "Dashboard" },
-  { id: "kamar" as NavPage, icon: "🏨", label: "Kamar" },
-  { id: "tamu" as NavPage, icon: "🐾", label: "Tamu" },
-  { id: "laporan" as NavPage, icon: "📊", label: "Laporan" },
+  { id: "dashboard" as NavPage, icon: LayoutDashboard, label: "Dashboard" },
+  { id: "rooms" as NavPage, icon: Hotel, label: "Rooms" },
+  { id: "guests" as NavPage, icon: PawPrint, label: "Guests" },
+  { id: "reports" as NavPage, icon: BarChart3, label: "Reports" },
 ];
 
 export default function Sidebar({
@@ -23,133 +33,605 @@ export default function Sidebar({
   onNavigate,
   totalSlots,
   occupiedCount,
+  mobileOpen,
+  onMobileClose,
 }: Props) {
   const [collapsed, setCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(() =>
+    NAV.findIndex((n) => n.id === activePage),
+  );
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [ripple, setRipple] = useState<{
+    x: number;
+    y: number;
+    id: number;
+  } | null>(null);
+  const [mobileVisible, setMobileVisible] = useState(false);
+  const [mobileAnimIn, setMobileAnimIn] = useState(false);
+  const rippleCounter = useRef(0);
 
-  return (
+  const occupancy =
+    totalSlots === 0 ? 0 : Math.round((occupiedCount / totalSlots) * 100);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    setActiveIndex(NAV.findIndex((n) => n.id === activePage));
+  }, [activePage]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      setMobileVisible(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setMobileAnimIn(true));
+      });
+    } else {
+      setMobileAnimIn(false);
+      const t = setTimeout(() => setMobileVisible(false), 320);
+      return () => clearTimeout(t);
+    }
+  }, [mobileOpen]);
+
+  const handleNavClick = (
+    id: NavPage,
+    idx: number,
+    e: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setRipple({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      id: ++rippleCounter.current,
+    });
+    setTimeout(() => setRipple(null), 600);
+    setActiveIndex(idx);
+    onNavigate(id);
+    onMobileClose();
+  };
+
+  const sidebarInner = (isMobile = false) => (
     <aside
-      className="flex flex-col h-screen sticky top-0 transition-all duration-300 anim-slide-right"
       style={{
-        width: collapsed ? "72px" : "var(--sidebar-w)",
-        backgroundColor: "var(--sidebar-bg)",
+        width: isMobile ? "220px" : collapsed ? "68px" : "220px",
+        backgroundColor: "#FFF4E6",
+        borderRight: "1.5px solid #FED7AA",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        transition: isMobile ? "none" : "width .3s cubic-bezier(.4,0,.2,1)",
+        overflow: "hidden",
+        position: "relative",
         flexShrink: 0,
-        zIndex: 40,
       }}
     >
-      {/* Logo */}
       <div
-        className="flex items-center gap-3 px-4 py-5 border-b"
-        style={{ borderColor: "rgba(255,255,255,.1)" }}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "3px",
+          background: "linear-gradient(90deg,#FB923C,#F97316,#EA580C)",
+          transform: mounted ? "scaleX(1)" : "scaleX(0)",
+          transformOrigin: "left",
+          transition: "transform .6s cubic-bezier(.4,0,.2,1)",
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          padding: "16px 12px",
+          borderBottom: "1.5px solid #FED7AA",
+          overflow: "hidden",
+        }}
       >
-        <span className="text-3xl anim-float flex-shrink-0">🐾</span>
-        {!collapsed && (
-          <div className="overflow-hidden">
-            <h1
-              className="text-xl font-extrabold leading-none shimmer-text"
-              style={{ fontFamily: "'Baloo 2', cursive" }}
-            >
-              Pawcation
-            </h1>
-            <p
-              className="text-xs mt-0.5"
-              style={{ color: "rgba(255,255,255,.5)" }}
-            >
-              Pet Hotel Dashboard
-            </p>
-          </div>
-        )}
-        <button
-          onClick={() => setCollapsed((v) => !v)}
-          className="ml-auto flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all hover:bg-white/20"
-          style={{ color: "rgba(255,255,255,.6)" }}
-        >
-          {collapsed ? "▶" : "◀"}
-        </button>
-      </div>
-
-      {/* Nav items */}
-      <nav className="flex flex-col gap-1 p-3 flex-1">
-        {NAV.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => onNavigate(item.id)}
-            className={`nav-item flex items-center gap-3 px-3 py-2.5 rounded-2xl text-left ${activePage === item.id ? "active" : ""}`}
-            style={{
-              color: "rgba(255,255,255,.85)",
-              fontFamily: "'Baloo 2', cursive",
-            }}
-          >
-            <span className="text-lg flex-shrink-0">{item.icon}</span>
-            {!collapsed && (
-              <span className="text-sm font-semibold">{item.label}</span>
-            )}
-          </button>
-        ))}
-      </nav>
-
-      {/* Occupancy gauge */}
-      {!collapsed && (
         <div
-          className="m-3 p-3 rounded-2xl"
-          style={{ backgroundColor: "rgba(255,255,255,.08)" }}
+          style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "12px",
+            background: "linear-gradient(135deg,#FB923C,#EA580C)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            animation: "pawFloat 3s ease-in-out infinite",
+            boxShadow: "0 4px 12px rgba(249,115,22,.35)",
+          }}
         >
-          <p
-            className="text-xs font-bold mb-2"
+          <PawPrint size={17} color="white" strokeWidth={2.5} />
+        </div>
+
+        <div
+          style={{
+            overflow: "hidden",
+            flex: 1,
+            opacity: !isMobile && collapsed ? 0 : 1,
+            transform:
+              !isMobile && collapsed ? "translateX(-8px)" : "translateX(0)",
+            transition: "opacity .2s ease, transform .25s ease",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <span
             style={{
-              color: "rgba(255,255,255,.7)",
+              display: "block",
+              fontSize: "17px",
+              fontWeight: 800,
               fontFamily: "'Baloo 2', cursive",
+              background:
+                "linear-gradient(90deg,#F97316,#FB923C,#EA580C,#F97316)",
+              backgroundSize: "300% auto",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              animation: "shimmer 4s linear infinite",
             }}
           >
-            🏠 Tingkat Hunian
-          </p>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-lg font-extrabold text-white">
-              {totalSlots === 0
-                ? "0"
-                : Math.round((occupiedCount / totalSlots) * 100)}
-              %
-            </span>
-            <span className="text-xs" style={{ color: "rgba(255,255,255,.5)" }}>
-              {occupiedCount}/{totalSlots} kamar
-            </span>
-          </div>
-          <div
-            className="h-2 rounded-full overflow-hidden"
-            style={{ backgroundColor: "rgba(255,255,255,.15)" }}
+            Pawcation
+          </span>
+          <span
+            style={{
+              display: "block",
+              fontSize: "11px",
+              fontWeight: 600,
+              color: "#C2410C",
+              opacity: 0.65,
+              marginTop: "-1px",
+            }}
+          >
+            Pet Hotel
+          </span>
+        </div>
+
+        {!isMobile ? (
+          <button
+            onClick={() => setCollapsed((v) => !v)}
+            className="hidden lg:flex"
+            style={{
+              width: "26px",
+              height: "26px",
+              borderRadius: "8px",
+              border: "1.5px solid #FED7AA",
+              backgroundColor: "white",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              flexShrink: 0,
+              color: "#C2410C",
+              transition: "all .2s ease",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                "#FFEDD5";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                "white";
+            }}
           >
             <div
-              className="h-full rounded-full transition-all duration-700"
               style={{
-                width:
-                  totalSlots === 0
-                    ? "0%"
-                    : `${(occupiedCount / totalSlots) * 100}%`,
-                background: "linear-gradient(90deg, #FCD34D, #F97316)",
+                transition: "transform .3s cubic-bezier(.4,0,.2,1)",
+                transform: collapsed ? "rotate(180deg)" : "rotate(0deg)",
+                display: "flex",
+              }}
+            >
+              <ChevronLeft size={13} strokeWidth={2.5} />
+            </div>
+          </button>
+        ) : (
+          <button
+            onClick={onMobileClose}
+            style={{
+              width: "26px",
+              height: "26px",
+              borderRadius: "8px",
+              border: "1.5px solid #FED7AA",
+              backgroundColor: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              flexShrink: 0,
+              color: "#C2410C",
+              transition: "all .2s ease",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                "#FFEDD5";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                "white";
+            }}
+          >
+            <X size={13} strokeWidth={2.5} />
+          </button>
+        )}
+      </div>
+
+      <div
+        style={{
+          padding: !isMobile && collapsed ? "12px 8px 4px" : "12px 12px 4px",
+          transition: "padding .3s ease",
+        }}
+      >
+        {(isMobile || !collapsed) && (
+          <span
+            style={{
+              fontSize: "10px",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              color: "#FDBA74",
+              display: "block",
+              opacity: mounted ? 1 : 0,
+              transform: mounted ? "translateY(0)" : "translateY(4px)",
+              transition: "opacity .4s ease .2s, transform .4s ease .2s",
+            }}
+          >
+            Navigation
+          </span>
+        )}
+      </div>
+
+      <nav
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "4px",
+          padding: "0 8px",
+          flex: 1,
+        }}
+      >
+        {NAV.map((item, idx) => {
+          const Icon = item.icon;
+          const isActive = activeIndex === idx;
+          const isHovered = hoveredIndex === idx;
+          const isCollapsed = !isMobile && collapsed;
+
+          return (
+            <button
+              key={item.id}
+              onClick={(e) => handleNavClick(item.id, idx, e)}
+              onMouseEnter={() => setHoveredIndex(idx)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              title={isCollapsed ? item.label : undefined}
+              style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: isCollapsed ? "9px" : "9px 12px",
+                borderRadius: "12px",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "'Baloo 2', cursive",
+                fontWeight: 600,
+                fontSize: "13.5px",
+                textAlign: "left",
+                width: "100%",
+                overflow: "hidden",
+                justifyContent: isCollapsed ? "center" : "flex-start",
+                color: isActive ? "white" : "#9A3412",
+                background: isActive
+                  ? "linear-gradient(135deg,#FB923C,#EA580C)"
+                  : isHovered
+                    ? "#FFEDD5"
+                    : "transparent",
+                transform:
+                  isHovered && !isActive ? "translateX(3px)" : "translateX(0)",
+                boxShadow: isActive
+                  ? "0 4px 14px rgba(249,115,22,.35)"
+                  : "none",
+                transition: "all .2s cubic-bezier(.4,0,.2,1)",
+                opacity: mounted ? 1 : 0,
+              }}
+              ref={(el) => {
+                if (el && !mounted) {
+                  el.style.transitionDelay = `${idx * 60}ms`;
+                }
+              }}
+            >
+              {ripple && isActive && (
+                <span
+                  style={{
+                    position: "absolute",
+                    left: ripple.x - 12,
+                    top: ripple.y - 12,
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(255,255,255,.4)",
+                    animation: "rippleOut .6s ease forwards",
+                    pointerEvents: "none",
+                  }}
+                />
+              )}
+
+              <span
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  transition: "transform .2s ease",
+                  transform: isActive ? "scale(1.1)" : "scale(1)",
+                }}
+              >
+                <Icon
+                  size={17}
+                  strokeWidth={isActive ? 2.5 : 2}
+                  style={{ transition: "all .2s ease" }}
+                />
+              </span>
+
+              <span
+                style={{
+                  opacity: isCollapsed ? 0 : 1,
+                  transform: isCollapsed ? "translateX(-6px)" : "translateX(0)",
+                  transition: "opacity .2s ease, transform .25s ease",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                }}
+              >
+                {item.label}
+              </span>
+
+              {isActive && !isCollapsed && (
+                <span
+                  style={{
+                    marginLeft: "auto",
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(255,255,255,.8)",
+                    animation: "dotPulse 2s ease-in-out infinite",
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div
+        style={{
+          margin: "8px",
+          padding: "12px",
+          borderRadius: "16px",
+          backgroundColor: "#FFF0E0",
+          border: "1.5px solid #FED7AA",
+          overflow: "hidden",
+          opacity: !isMobile && collapsed ? 0 : 1,
+          transform: !isMobile && collapsed ? "scale(.95)" : "scale(1)",
+          transition: "opacity .2s ease, transform .25s ease",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "8px",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "11px",
+              fontWeight: 700,
+              color: "#9A3412",
+              fontFamily: "'Baloo 2', cursive",
+            }}
+          >
+            Occupancy
+          </span>
+          <span
+            style={{
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#EA580C",
+              fontFamily: "'Baloo 2', cursive",
+              transition: "all .4s ease",
+            }}
+          >
+            {occupancy}%
+          </span>
+        </div>
+
+        <div
+          style={{
+            height: "6px",
+            borderRadius: "99px",
+            backgroundColor: "#FED7AA",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              borderRadius: "99px",
+              width: `${occupancy}%`,
+              background: "linear-gradient(90deg,#FDBA74,#F97316,#EA580C)",
+              transition: "width .8s cubic-bezier(.4,0,.2,1)",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(90deg,transparent 0%,rgba(255,255,255,.4) 50%,transparent 100%)",
+                backgroundSize: "200% 100%",
+                animation:
+                  occupancy > 0 ? "barShimmer 2s linear infinite" : "none",
               }}
             />
           </div>
         </div>
-      )}
 
-      {/* Footer */}
-      <div
-        className="p-4 text-center border-t"
-        style={{ borderColor: "rgba(255,255,255,.1)" }}
-      >
-        {collapsed ? (
-          <span className="text-lg">😺</span>
-        ) : (
-          <p
-            className="text-xs"
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "6px",
+          }}
+        >
+          <span
             style={{
-              color: "rgba(255,255,255,.35)",
-              fontFamily: "'Nunito', sans-serif",
+              fontSize: "11px",
+              fontWeight: 600,
+              color: "#C2410C",
+              opacity: 0.65,
             }}
           >
-            © 2026 Pawcation
-          </p>
-        )}
+            {occupiedCount} occupied
+          </span>
+          <span
+            style={{
+              fontSize: "11px",
+              fontWeight: 600,
+              color: "#C2410C",
+              opacity: 0.65,
+            }}
+          >
+            {totalSlots} total
+          </span>
+        </div>
       </div>
+
+      <div
+        style={{
+          padding: "10px 12px",
+          borderTop: "1.5px solid #FED7AA",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: "28px",
+            height: "28px",
+            borderRadius: "10px",
+            background: "linear-gradient(135deg,#FB923C,#C2410C)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <PawPrint size={13} color="white" strokeWidth={2.5} />
+        </div>
+        <div
+          style={{
+            opacity: !isMobile && collapsed ? 0 : 1,
+            transform:
+              !isMobile && collapsed ? "translateX(-8px)" : "translateX(0)",
+            transition: "opacity .2s ease, transform .25s ease",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#431407",
+              fontFamily: "'Baloo 2', cursive",
+            }}
+          >
+            Admin
+          </p>
+          <p
+            style={{
+              fontSize: "10px",
+              fontWeight: 600,
+              color: "#C2410C",
+              opacity: 0.6,
+            }}
+          >
+            Hotel Manager
+          </p>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes pawFloat {
+          0%,100% { transform: translateY(0) rotate(0deg); }
+          33%      { transform: translateY(-3px) rotate(-5deg); }
+          66%      { transform: translateY(-5px) rotate(4deg); }
+        }
+        @keyframes shimmer {
+          0%   { background-position: -300% center; }
+          100% { background-position:  300% center; }
+        }
+        @keyframes dotPulse {
+          0%,100% { opacity: .5; transform: scale(1); }
+          50%     { opacity: 1;  transform: scale(1.4); }
+        }
+        @keyframes rippleOut {
+          0%   { transform: scale(1); opacity: .5; }
+          100% { transform: scale(6); opacity: 0; }
+        }
+        @keyframes barShimmer {
+          0%   { background-position: -200% 0; }
+          100% { background-position:  200% 0; }
+        }
+      `}</style>
     </aside>
+  );
+
+  return (
+    <>
+      <div
+        className="hidden lg:flex h-screen sticky top-0 flex-shrink-0"
+        style={{
+          width: collapsed ? "68px" : "220px",
+          transition: "width .3s cubic-bezier(.4,0,.2,1)",
+        }}
+      >
+        {sidebarInner(false)}
+      </div>
+
+      {mobileVisible && (
+        <div
+          className="lg:hidden fixed inset-0 z-50 flex"
+          style={{
+            backgroundColor: mobileAnimIn ? "rgba(0,0,0,.35)" : "rgba(0,0,0,0)",
+            transition: "background-color .3s ease",
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onMobileClose();
+          }}
+        >
+          <div
+            style={{
+              width: "220px",
+              height: "100%",
+              transform: mobileAnimIn ? "translateX(0)" : "translateX(-100%)",
+              transition: "transform .32s cubic-bezier(.4,0,.2,1)",
+              boxShadow: mobileAnimIn
+                ? "4px 0 32px rgba(249,115,22,.18)"
+                : "none",
+            }}
+          >
+            {sidebarInner(true)}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

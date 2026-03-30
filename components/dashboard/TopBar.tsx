@@ -1,109 +1,112 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Menu, Plus, Clock, Users } from "lucide-react";
+import { NavPage } from "./Sidebar";
 
 interface Props {
-  pageTitle: string;
-  pageEmoji: string;
+  activePage: NavPage;
   onAddSlot: () => void;
   occupiedCount: number;
+  onMobileMenuOpen: () => void;
 }
 
+const PAGE_META: Record<NavPage, { title: string; subtitle: string }> = {
+  dashboard: { title: "Dashboard", subtitle: "Welcome back, Admin!" },
+  rooms: { title: "Rooms", subtitle: "Manage your pet rooms" },
+  guests: { title: "Guests", subtitle: "Current staying guests" },
+  reports: { title: "Reports", subtitle: "Hotel performance overview" },
+};
+
 export default function TopBar({
-  pageTitle,
-  pageEmoji,
+  activePage,
   onAddSlot,
   occupiedCount,
+  onMobileMenuOpen,
 }: Props) {
   const [time, setTime] = useState("");
 
   useEffect(() => {
-    const tick = () => {
+    const tick = () =>
       setTime(
-        new Date().toLocaleTimeString("id-ID", {
+        new Date().toLocaleTimeString("en-US", {
           hour: "2-digit",
           minute: "2-digit",
         }),
       );
-    };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
 
+  const meta = PAGE_META[activePage];
+
   return (
     <header
-      className="flex items-center justify-between px-6 py-4 sticky top-0 z-30"
+      className="flex items-center justify-between px-5 sticky top-0 z-30"
       style={{
-        backgroundColor: "rgba(253,243,231,.92)",
+        height: "var(--topbar-h)",
+        backgroundColor: "rgba(255,251,245,.92)",
         backdropFilter: "blur(12px)",
-        borderBottom: "2px solid var(--color-o200)",
+        borderBottom: "1.5px solid #FED7AA",
       }}
     >
-      {/* Page title */}
       <div className="flex items-center gap-3">
-        <div
-          className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shadow-sm"
-          style={{ backgroundColor: "var(--color-o500)", color: "white" }}
+        <button
+          onClick={onMobileMenuOpen}
+          className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-orange-100"
+          style={{ color: "#EA580C" }}
         >
-          {pageEmoji}
-        </div>
+          <Menu size={18} strokeWidth={2} />
+        </button>
         <div>
           <h2
-            className="text-lg font-extrabold leading-none"
-            style={{
-              color: "var(--color-o800)",
-              fontFamily: "'Baloo 2', cursive",
-            }}
+            className="text-base font-extrabold leading-tight"
+            style={{ color: "#431407", fontFamily: "'Baloo 2', cursive" }}
           >
-            {pageTitle}
+            {meta.title}
           </h2>
-          <p className="text-xs mt-0.5" style={{ color: "var(--color-o400)" }}>
-            Pawcation Pet Hotel Management
+          <p className="text-xs font-semibold" style={{ color: "#FB923C" }}>
+            {meta.subtitle}
           </p>
         </div>
       </div>
 
-      {/* Right area */}
-      <div className="flex items-center gap-3">
-        {/* Time */}
+      <div className="flex items-center gap-2">
         <div
-          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-bold"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
           style={{
-            backgroundColor: "var(--color-o100)",
-            color: "var(--color-o600)",
+            backgroundColor: "#FFF4E6",
+            color: "#EA580C",
+            border: "1.5px solid #FED7AA",
           }}
         >
-          <span>🕐</span>
+          <Clock size={13} strokeWidth={2} />
           <span style={{ fontFamily: "'Baloo 2', cursive" }}>{time}</span>
         </div>
 
-        {/* Notif badge */}
         {occupiedCount > 0 && (
           <div
-            className="relative flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-bold"
-            style={{ backgroundColor: "var(--color-o500)", color: "white" }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
+            style={{
+              backgroundColor: "#FFF4E6",
+              color: "#C2410C",
+              border: "1.5px solid #FED7AA",
+            }}
           >
-            <span>😺</span>
+            <Users size={13} strokeWidth={2} />
             <span style={{ fontFamily: "'Baloo 2', cursive" }}>
-              {occupiedCount} tamu
+              {occupiedCount} guests
             </span>
           </div>
         )}
 
-        {/* CTA */}
         <button
           onClick={onAddSlot}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-md"
-          style={{
-            background:
-              "linear-gradient(135deg, var(--color-o500), var(--color-o700))",
-            fontFamily: "'Baloo 2', cursive",
-            boxShadow: "0 4px 14px rgba(249,115,22,.4)",
-          }}
+          className="btn-primary flex items-center gap-1.5"
         >
-          <span>+</span>
-          <span>Tambah Kamar</span>
+          <Plus size={14} strokeWidth={2.5} />
+          <span className="hidden sm:inline">Add Room</span>
         </button>
       </div>
     </header>
