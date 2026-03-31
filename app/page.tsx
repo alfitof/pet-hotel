@@ -121,7 +121,7 @@ export default function DashboardPage() {
 
   return (
     <div
-      className="flex h-screen overflow-hidden"
+      className="flex h-screen overflow-hidden w-screen max-w-full"
       style={{ backgroundColor: "var(--color-sand)" }}
     >
       <Sidebar
@@ -133,7 +133,7 @@ export default function DashboardPage() {
         onMobileClose={() => setMobileOpen(false)}
       />
 
-      <div className="flex flex-col flex-1 overflow-hidden min-w-0">
+      <div className="flex flex-col flex-1 overflow-hidden min-w-0 w-0">
         <TopBar
           activePage={activePage}
           onAddSlot={addSlot}
@@ -141,7 +141,7 @@ export default function DashboardPage() {
           onMobileMenuOpen={() => setMobileOpen(true)}
         />
 
-        <main className="flex-1 overflow-y-auto p-4 lg:p-5 flex flex-col gap-4">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-5 flex flex-col gap-4 overflow-x-hidden">
           {activePage === "dashboard" && (
             <>
               <WelcomeBanner

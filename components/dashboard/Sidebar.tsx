@@ -520,8 +520,8 @@ export default function Sidebar({
   return (
     <>
       <div
-        className="hidden lg:flex h-screen sticky top-0 flex-shrink-0"
-        style={{ width: "220px" }}
+        className="hidden lg:flex h-screen sticky top-0"
+        style={{ width: "220px", minWidth: "220px", flexShrink: 0 }}
       >
         {sidebarInner(false)}
       </div>
