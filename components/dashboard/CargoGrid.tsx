@@ -87,7 +87,13 @@ export default function CargoGrid({
           </button>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-4 justify-around">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${Math.min(slots.length + 1, 5)}, minmax(0, 1fr))`,
+            gap: "16px",
+          }}
+        >
           {slots.map((slot) => (
             <CargoSlot
               key={slot.id}
@@ -100,20 +106,19 @@ export default function CargoGrid({
           ))}
 
           <div
-            className="flex flex-col items-center justify-center cursor-pointer group transition-all hover:scale-104"
-            style={{ width: "120px" }}
             onClick={onAddSlot}
+            className="cursor-pointer group transition-all hover:scale-105"
+            style={{ minHeight: "160px" }}
           >
             <div
-              className="w-full rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 py-10 transition-all group-hover:border-orange-400 group-hover:bg-orange-50"
-              style={{ borderColor: "#FED7AA", backgroundColor: "#FFF7ED" }}
+              className="w-full h-full rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all group-hover:border-orange-400 group-hover:bg-orange-50"
+              style={{
+                borderColor: "#FED7AA",
+                backgroundColor: "#FFF7ED",
+                minHeight: "160px",
+              }}
             >
-              <Plus
-                size={22}
-                color="#FDBA74"
-                strokeWidth={2}
-                className="group-hover:text-orange-400 transition-colors"
-              />
+              <Plus size={22} color="#FDBA74" strokeWidth={2} />
               <span
                 className="text-xs font-bold text-center"
                 style={{ color: "#FDBA74", fontFamily: "'Baloo 2', cursive" }}
