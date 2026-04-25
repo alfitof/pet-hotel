@@ -88,13 +88,8 @@ export default function CargoGrid({
         </div>
       ) : (
         <div
-        className="cargo-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${Math.min(slots.length + 1, 5)}, minmax(0, 1fr))`,
-            gap: "16px",
-          }}
-        >
+  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4"
+>
           {slots.map((slot) => (
             <CargoSlot
               key={slot.id}

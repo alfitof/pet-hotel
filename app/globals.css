@@ -287,9 +287,3 @@ h6 {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(249, 115, 22, 0.14) !important;
 }
-
-@media (max-width: 640px) {
-  .cargo-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-}
