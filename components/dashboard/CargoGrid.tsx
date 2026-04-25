@@ -88,8 +88,8 @@ export default function CargoGrid({
         </div>
       ) : (
         <div
+        className="cargo-grid"
           style={{
-            className="cargo-grid",
             display: "grid",
             gridTemplateColumns: `repeat(${Math.min(slots.length + 1, 5)}, minmax(0, 1fr))`,
             gap: "16px",
